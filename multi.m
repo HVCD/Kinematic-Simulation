@@ -7,7 +7,7 @@
 % Version: v1.0 [06/16/2019][Wenyu]
 %          v1.1 [06/19/2019][Zhenyu] add PID control 
 %          v1.2 [06/21/2019][Zhenyu] add robort control
-%          v1.3 [06/21/2019][Zhenyu] 
+%          v1.3 [06/21/2019][Zhenyu] add a comparison of the three methods
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% init parameters
@@ -37,13 +37,6 @@ y_non = 0;
 theta_non = 0;
 
 %init PID
-dx_before = x4_PID - x_PID;
-dy_before = y4_PID - y_PID;
-dth_before = theta4_PID - theta_PID;
-
-dx_add = dx_before;
-dy_add = dy_before;
-dth_add = dth_before;
 
 Kp_v=[100 100 100];
 Ki_v=[0.5 0.5 0.5];
@@ -66,6 +59,15 @@ theta2_PID = 0;
 x_PID = 0;
 y_PID = 0;
 theta_PID = 0;
+
+% initialize pid data
+dx_before = x4_PID - x_PID;
+dy_before = y4_PID - y_PID;
+dth_before = theta4_PID - theta_PID;
+dx_add = dx_before;
+dy_add = dy_before;
+dth_add = dth_before;
+
 
 % init robort parameters
 kalpha = 5;
@@ -91,11 +93,14 @@ amount = 1000;
 t = 1 : amount;
 TIME = t * dt;
 
-% init input function
-VR = 15 + 15 * sin(t / amount * 5 * pi);
-PHI = pi / 6 * sin(t / amount * 5 * pi + pi / 2);
+% init input function (simple)
+VR = 8.5 + 8.5 * sin(t / amount * 2 * pi);
+PHI = pi / 6 * sin(t / amount * 2 * pi + pi / 2);
 
-%% simulation
+% init input function (extreme)
+%VR = 15 + 15 * sin(t / amount * 5 * pi);
+%PHI = pi / 6 * sin(t / amount * 5 * pi + pi / 2);
+%% simulation for nonlinear controller, PID controller and robotic controller
 for i = 1 : amount
     disp(i);
     %% input
@@ -335,7 +340,9 @@ plot(TIME, PHI, 'r');
 xlabel('Time (s)')
 ylabel('phi (rad)')
 
-% X and Y direction and errors
+%  X, Y and theta errors while red line corresponds to nonlinear controller, 
+%  blue line corresponds to PID controller, 
+%  black line corresponds to robotic controller
 figure;
 hold on;
 
@@ -355,7 +362,6 @@ plot(TIME, Rye_robo, 'k');
 xlabel('Time (s)')
 ylabel('Y (m)')
 
-% theta and error
 figure;
 subplot(2, 1, 1);
 hold on;
